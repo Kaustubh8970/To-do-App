@@ -1,0 +1,96 @@
+import axios from 'axios'
+import {useState,useEffect} from 'react'
+function App() {
+
+    const[items,setItems]=useState([]);
+    const[name,setName]=useState('')
+    const[description,setDescription]=useState('')
+    const[editingId,setEditingId]=useState(null)
+
+
+    useEffect(()=>{
+      datafetch()
+    })
+
+
+    const datafetch= async()=>{
+      try{
+          const response =  await axios.get('http://localhost:8082/myapi')
+          setItems(response.data)
+      }catch(err){
+        console.log(err)
+      }
+    }
+
+
+      const addingdata= async(e)=>{
+
+
+        e.preventDefault();
+        try{
+          if(!editingId){
+            await axios.post('http://localhost:8082/myapi',{name,description})
+          }
+          else{
+            await axios.put(http://localhost:8082/myapi/${editingId},{name,description})
+            setEditingId(null)
+          }
+          datafetch()
+          setName('')
+          setDescription('')
+        }
+        catch(err){
+          console.log(err)
+        }
+
+        
+      }
+
+
+
+      const datadelete= async(id)=>{
+
+try{
+  await axios.delete(http://localhost:8082/myapi/${id})
+datafetch()
+} catch(err){
+  console.log(err)
+}
+      }
+
+      const handleedit = (data)=>{
+        setEditingId(data._id)
+        setName(data.name)
+        setDescription(data.description)
+      }
+
+
+  return <>
+  
+  <h1>Crud in Mern</h1>
+
+  <form onSubmit={addingdata}>
+
+      <input  placeholder='name' value={name}  onChange={(e)=>{setName(e.target.value)}}   />
+      <input  placeholder='description' value={description}  onChange={(e)=>{setDescription(e.target.value)}}   />
+
+        <button>{editingId?'update data':'add data'}</button>
+
+  </form>
+
+
+      <ul>
+        {items.map((item)=>(
+          <li key={item._id}>
+            <h1>{item.name}</h1>
+            <h1>{item.description}</h1>
+            <button  onClick={()=>{handleedit(item)}}  >edit</button>
+            <button onClick={()=>{datadelete(item._id)}}>delete</button>
+          </li>
+        ))}
+      </ul>
+
+  </>
+}
+
+export default App;
